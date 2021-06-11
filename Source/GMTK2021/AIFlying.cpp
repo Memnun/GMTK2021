@@ -3,10 +3,15 @@
 
 #include "AIFlying.h"
 
+#include "GameFramework/FloatingPawnMovement.h"
+#include "Components/SphereComponent.h"
+
 // Sets default values
-AAIFlying::AAIFlying()
+AAIFlying::AAIFlying(const FObjectInitializer& ObjectInitializer)
+    : Super(ObjectInitializer.SetDefaultSubobjectClass<UFloatingPawnmovement>(ACharacter::CharacterMovementComponentName))
 {
 
+    MovementPtr = Cast<UFloatingPawnMovement>(ACharacter::GetMovementComponent());
 }
 
 // Called when the game starts or when spawned
@@ -14,13 +19,14 @@ void AAIFlying::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	FTimerHandle FindPlayerHandle;
+	GetWorld()->GetTimerManager().SetTimer(FindPlayerHandle, this, &AAIFlying::MoveTowardsPlayer, 0.5f, true);
 }
 
-
-// Called to bind functionality to input
-void AAIFlying::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AAIFlying::MoveTowardsPlayer()
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, TEXT("Yeah"));
 
+	Cast<UFloatingPawnMovement>(CharacterMovement)
 }
 
