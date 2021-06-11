@@ -9,7 +9,8 @@
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
-				"Engine"
+				"Engine",
+				"AIModule"
 			]
 		}
 	],
@@ -24,6 +25,14 @@
 			"SupportedTargetPlatforms": [
 				"Win64",
 				"Mac",
+				"Linux"
+			]
+		},
+		{
+			"Name": "SteamVR",
+			"Enabled": false,
+			"SupportedTargetPlatforms": [
+				"Win64",
 				"Linux"
 			]
 		}
