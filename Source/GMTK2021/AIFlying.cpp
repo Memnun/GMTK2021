@@ -27,6 +27,6 @@ void AAIFlying::MoveTowardsPlayer()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, TEXT("Yeah"));
 
-	Cast<UFloatingPawnMovement>(CharacterMovement)
+	//Cast<UFloatingPawnMovement>(CharacterMovement)
 }
 

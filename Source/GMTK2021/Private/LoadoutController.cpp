@@ -2,7 +2,6 @@
 
 
 #include "LoadoutController.h"
-#include "ComponentData.h"
 
 class LoadoutController {
 
