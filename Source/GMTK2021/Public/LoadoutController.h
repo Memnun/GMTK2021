@@ -41,5 +41,5 @@ public:
 	CoreComponent CoreSlot;
 	ArmComponent LeftArmSlot;
 	ArmComponent RightArmSlot;
-	legComponent LegSlot;
+	LegComponent LegSlot;
 };
