@@ -51,11 +51,6 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Controls)
     float MouseSensitivity;
 
-    UPROPERTY(EditAnywhere, Category = Shooting)
-    TSubclassOf<AActor> ShootingBP;
-
-    AActor* Shooting;
-
 private:
 
     float NormalFieldOfView;
