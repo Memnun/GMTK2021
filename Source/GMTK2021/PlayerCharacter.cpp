@@ -41,6 +41,10 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
     CameraComponent->SetNetAddressable();
     CameraComponent->SetIsReplicated(true);
 
+    NormalFieldOfView = CameraComponent->FieldOfView;
+    WallRunFieldOfView = 110.f;
+    TargetFieldOfView = NormalFieldOfView;
+
     /*
     SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("Weapon Spring Arm"));
     SpringArmComponent->bEnableCameraRotationLag = true;
@@ -71,6 +75,8 @@ void APlayerCharacter::Tick(float DeltaTime)
     FRotator CameraRotation = GetController()->GetControlRotation();
     FRotator TargetRotation = FRotator(CameraRotation.Pitch, CameraRotation.Yaw, CameraTargetRoll);
     GetController()->SetControlRotation(FMath::RInterpTo(CameraRotation, TargetRotation, DeltaTime, 10.f));
+
+    CameraComponent->FieldOfView = FMath::FInterpTo(CameraComponent->FieldOfView, TargetFieldOfView, DeltaTime, 5.f);
 
     // Weapon swaying
     /*
@@ -240,6 +246,7 @@ void APlayerCharacter::BeginWallRun()
     bIsWallRunning = true;
     BeginCameraTilt();
     GetWorld()->GetTimerManager().SetTimer(WallRunHandle, this, &APlayerCharacter::UpdateWallRun, 0.05f, true);
+    TargetFieldOfView = WallRunFieldOfView;
 
     if (MovementPtr->Velocity.Z < 0)
     {
@@ -310,6 +317,7 @@ void APlayerCharacter::EndWallRun(EWallRunEndReason Reason)
     MovementPtr->GravityScale = 1.f;
 
     EndCameraTilt();
+    TargetFieldOfView = NormalFieldOfView;
 
     GetWorld()->GetTimerManager().ClearTimer(WallRunHandle);
 

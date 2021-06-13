@@ -41,11 +41,18 @@ public:
     int WallJumpVelocity;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = WallRun)
-    int WallRunClimbVelocity;
+    float WallRunClimbVelocity;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = WallRun)
+    float WallRunFieldOfView;
 
     bool bIsWallRunning;
 
 private:
+
+    float NormalFieldOfView;
+
+    float TargetFieldOfView;
 
     FVector WallRunDirection;
 
