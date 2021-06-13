@@ -257,6 +257,10 @@ void APlayerCharacter::UpdateWallRun()
         MovementPtr->Velocity.Z = 0;
     }
 
+    // Slight vertical climb
+    MovementPtr->Velocity.Z = WallRunClimbVelocity;
+
+
     FCollisionQueryParams TraceParams = FCollisionQueryParams(FName(TEXT("Trace")), false, this);
 
     //Re-initialize hit info

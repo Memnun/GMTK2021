@@ -40,6 +40,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = WallRun)
     int WallJumpVelocity;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = WallRun)
+    int WallRunClimbVelocity;
+
     bool bIsWallRunning;
 
 private:
