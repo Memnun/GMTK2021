@@ -201,7 +201,7 @@ void UPlayerMovement::ApplyVelocityBraking(float DeltaTime, float Friction, floa
 	const bool bZeroFriction = FMath::IsNearlyZero(Friction);
 	const bool bZeroBraking = BrakingDeceleration == 0.0f;
 
-	if (bZeroFriction || bZeroBraking)
+	if (bZeroFriction || bZeroBraking || Character->bIsWallRunning)
 	{
 		return;
 	}

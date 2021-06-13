@@ -13,102 +13,179 @@ class USpringArmComponent;
 class UBoxComponent;
 class AController;
 
+UENUM()
+enum EWallRunSide {
+	LEFT	UMETA(DisplayName = "Left"),
+	RIGHT	UMETA(DisplayName = "Right")
+};
+
+UENUM()
+enum EWallRunEndReason {
+    FALL	UMETA(DisplayName = "Fell off wall"),
+    JUMP	UMETA(DisplayName = "Jumped off wall")
+};
+
 UCLASS()
 class GMTK2021_API APlayerCharacter : public ACharacter
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
-	APlayerCharacter(const FObjectInitializer& ObjectInitializer);
+    // Sets default values for this character's properties
+    APlayerCharacter(const FObjectInitializer& ObjectInitializer);
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = WallRun)
+    int MaxJumps;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = WallRun)
+    int WallJumpVelocity;
+
+    bool bIsWallRunning;
 
 private:
 
-	bool bIsSprinting;
+    FVector WallRunDirection;
 
-	bool bWantsToWalk;
+    TEnumAsByte<EWallRunSide> WallRunSide;
+    TEnumAsByte<EWallRunSide> PrevWallRunSide;
 
-	float LastJumpTime;
+    FTimerHandle WallRunHandle;
 
-	float LastJumpBoostTime;
+    int JumpsRemaining;
 
-	float MaxJumpTime;
+    bool bIsSprinting;
 
-	UPlayerMovement* MovementPtr;
+    bool bWantsToWalk;
+
+    float LastJumpTime;
+
+    float LastJumpBoostTime;
+
+    float MaxJumpTime;
+
+    float ForwardAxis;
+    float RightAxis;
+
+    float CameraTargetRoll;
+
+    UPlayerMovement* MovementPtr;
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+    // Called when the game starts or when spawned
+    virtual void BeginPlay() override;
 
-	virtual void Tick(float DeltaTime) override;
+    virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION()
-	void MoveForward(float Value);
+    UFUNCTION()
+    void MoveForward(float Value);
 
-	UFUNCTION()
-	void MoveRight(float Value);
+    UFUNCTION()
+    void MoveRight(float Value);
 
-	UFUNCTION()
-	void Turn(float Rate);
+    UFUNCTION()
+    void Turn(float Rate);
 
-	UFUNCTION()
-	void LookUp(float Rate);
+    UFUNCTION()
+    void LookUp(float Rate);
 
-	UFUNCTION()
-	void Sprint();
+    UFUNCTION()
+    void Sprint();
 
-	UFUNCTION()
-	void StopSprinting();
+    UFUNCTION()
+    void StopSprinting();
 
-	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Player|Camera")
-	float BaseTurnRate;
+    UFUNCTION()
+    void DoJump();
 
-	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Player|Camera")
-	float BaseLookUpRate;
+    UFUNCTION()
+    void ResetJump(int Jumps);
 
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Player|Gameplay")
-	bool bAutoBunnyhop;
+    UFUNCTION()
+    void BeginWallRun();
+
+    UFUNCTION()
+    void UpdateWallRun();
+
+    UFUNCTION()
+    void EndWallRun(EWallRunEndReason Reason);
+
+    UFUNCTION()
+    void BeginCameraTilt();
+
+    UFUNCTION()
+    void EndCameraTilt();
+
+    UFUNCTION()
+    void FindRunDirectionAndSide(FVector WallNormal);
+
+    UFUNCTION()
+    bool CanSurfaceBeWallRan(FVector SurfaceNormal) const;
+
+    UFUNCTION()
+    FVector FindLaunchVelocity();
+
+    UFUNCTION()
+    bool CheckRequiredKeys();
+
+    UFUNCTION()
+    bool ConsumeJump();
+
+    UFUNCTION()
+    void JumpBoost();
+
+    UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Player|Camera")
+    float BaseTurnRate;
+
+    UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Player|Camera")
+    float BaseLookUpRate;
+
+    UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Player|Gameplay")
+    bool bAutoBunnyhop;
 
 public:
 
-	UPROPERTY(EditAnywhere)
-	UCameraComponent* CameraComponent;
+    UPROPERTY(EditAnywhere)
+    UCameraComponent* CameraComponent;
 
-	UPROPERTY(EditAnywhere)
-	USpringArmComponent* SpringArmComponent;
+    UPROPERTY(EditAnywhere)
+    USpringArmComponent* SpringArmComponent;
+    
+    UFUNCTION()
+    void OnComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	virtual void ClearJumpInput(float DeltaTime) override;
-	virtual void OnJumped_Implementation() override;
-	virtual bool CanJumpInternal_Implementation() const override;
+    virtual void OnJumped_Implementation() override;
+    virtual bool CanJumpInternal_Implementation() const override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+    // Called to bind functionality to input
+    virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	float GetLastJumpTime()
-	{
-		return LastJumpTime;
-	}
+    virtual void Landed(const FHitResult& Hit) override;
 
-	UFUNCTION()
-		bool IsSprinting() const
-	{
-		return bIsSprinting;
-	}
+    float GetLastJumpTime()
+    {
+        return LastJumpTime;
+    }
 
-	UFUNCTION()
-		bool DoesWantToWalk() const
-	{
-		return bWantsToWalk;
-	}
+    UFUNCTION()
+        bool IsSprinting() const
+    {
+        return bIsSprinting;
+    }
 
-	UFUNCTION(Category = "B Getters", BlueprintPure) FORCEINLINE UPlayerMovement* GetMovementPtr() const
-	{
-		return MovementPtr;
-	};
+    UFUNCTION()
+        bool DoesWantToWalk() const
+    {
+        return bWantsToWalk;
+    }
 
-	/* Change Camera Height */
-	void RecalculateBaseEyeHeight() override
-	{
-		Super::Super::RecalculateBaseEyeHeight();
-	}
+    UFUNCTION(Category = "B Getters", BlueprintPure) FORCEINLINE UPlayerMovement* GetMovementPtr() const
+    {
+        return MovementPtr;
+    };
+
+    /* Change Camera Height */
+    void RecalculateBaseEyeHeight() override
+    {
+        Super::Super::RecalculateBaseEyeHeight();
+    }
 };
