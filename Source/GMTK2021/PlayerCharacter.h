@@ -48,6 +48,9 @@ public:
 
     bool bIsWallRunning;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Controls)
+    float MouseSensitivity;
+
 private:
 
     float NormalFieldOfView;

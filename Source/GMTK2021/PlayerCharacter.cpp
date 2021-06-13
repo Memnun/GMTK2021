@@ -31,6 +31,8 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
     JumpsRemaining = MaxJumps;
     WallJumpVelocity = 200.f;
 
+    MouseSensitivity = 1.f;
+
     MovementPtr = Cast<UPlayerMovement>(ACharacter::GetMovementComponent());
 
     CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
@@ -146,14 +148,14 @@ void APlayerCharacter::MoveRight(float Value)
 
 void APlayerCharacter::Turn(float Rate)
 {
-    Rate = Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds();
+    Rate = Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds() * MouseSensitivity;
 
     AddControllerYawInput(Rate);
 }
 
 void APlayerCharacter::LookUp(float Rate)
 {
-    Rate = Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds();
+    Rate = Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds() * MouseSensitivity;
 
     AddControllerPitchInput(Rate);
 }
@@ -307,7 +309,7 @@ void APlayerCharacter::EndWallRun(EWallRunEndReason Reason)
     switch (Reason)
     {
     case EWallRunEndReason::FALL:
-        ResetJump(0);
+        ResetJump(1);
         break;
     case EWallRunEndReason::JUMP:
         ResetJump(MaxJumps - 1);
