@@ -46,6 +46,12 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = WallRun)
     float WallRunFieldOfView;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
+    float RollAngle;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
+    float RollSpeed;
+
     bool bIsWallRunning;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Controls)
@@ -145,6 +151,9 @@ protected:
 
     UFUNCTION()
     void JumpBoost();
+
+    UFUNCTION()
+    float CalculateViewRoll();
 
     UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Player|Camera")
     float BaseTurnRate;

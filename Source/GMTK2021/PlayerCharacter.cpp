@@ -33,6 +33,8 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 
     MouseSensitivity = 1.f;
 
+    RollAngle = 2.0f;
+
     MovementPtr = Cast<UPlayerMovement>(ACharacter::GetMovementComponent());
 
     CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
@@ -79,6 +81,9 @@ void APlayerCharacter::Tick(float DeltaTime)
     GetController()->SetControlRotation(FMath::RInterpTo(CameraRotation, TargetRotation, DeltaTime, 10.f));
 
     CameraComponent->FieldOfView = FMath::FInterpTo(CameraComponent->FieldOfView, TargetFieldOfView, DeltaTime, 5.f);
+
+    if (!bIsWallRunning)
+        GetController()->SetControlRotation(FRotator(CameraRotation.Pitch, CameraRotation.Yaw, CalculateViewRoll()));
 
     // Weapon swaying
     /*
@@ -483,6 +488,26 @@ void APlayerCharacter::JumpBoost()
             GetMovementComponent()->Velocity = JumpBoostedVel;
         }
     }
+}
+
+float APlayerCharacter::CalculateViewRoll()
+{
+    float	Sign;
+    float	Side;
+    float	Value;
+
+    Side = FVector::DotProduct(MovementPtr->Velocity, GetActorRightVector());
+    Sign = Side < 0 ? -1 : 1;
+    Side = FMath::Abs(Side);
+
+    Value = RollAngle;
+
+	if (Side < RollSpeed)
+		Side = Side * Value / RollSpeed;
+	else
+		Side = Value;
+	
+	return Side*Sign;
 }
 
 void APlayerCharacter::OnComponentHit(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, FVector NormalImpulse, const FHitResult & Hit)
