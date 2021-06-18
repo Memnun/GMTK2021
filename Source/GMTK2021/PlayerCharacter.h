@@ -12,6 +12,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class UBoxComponent;
 class AController;
+class AWeapon;
 
 UENUM()
 enum EWallRunSide {
@@ -33,6 +34,15 @@ class GMTK2021_API APlayerCharacter : public ACharacter
 public:
     // Sets default values for this character's properties
     APlayerCharacter(const FObjectInitializer& ObjectInitializer);
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
+    float ViewSwayAmount;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
+    float ViewWeaponLeadAmount;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
+    float MaxWeaponSway;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = WallRun)
     int MaxJumps;
@@ -56,6 +66,14 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Controls)
     float MouseSensitivity;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+    FVector WeaponOffset;
+
+    UPROPERTY(EditAnywhere, Category = Spawn)
+    TSubclassOf<AWeapon> SpawnWeapon;
+
+    AWeapon* CurrentWeapon;
 
 private:
 
@@ -154,6 +172,9 @@ protected:
 
     UFUNCTION()
     float CalculateViewRoll();
+
+    UFUNCTION()
+    void FireWeapon();
 
     UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Player|Camera")
     float BaseTurnRate;

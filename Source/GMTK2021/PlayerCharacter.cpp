@@ -11,6 +11,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Engine/Engine.h"
 #include "DrawDebugHelpers.h"
+#include "Weapon.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
@@ -49,6 +50,10 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
     WallRunFieldOfView = 110.f;
     TargetFieldOfView = NormalFieldOfView;
 
+    ViewSwayAmount = 1.0f;
+    ViewWeaponLeadAmount = 2.0f;
+    MaxWeaponSway = 2.5f;
+
     /*
     SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("Weapon Spring Arm"));
     SpringArmComponent->bEnableCameraRotationLag = true;
@@ -70,6 +75,18 @@ void APlayerCharacter::BeginPlay()
 
     GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &APlayerCharacter::OnComponentHit);
 
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.Owner = this;
+    SpawnParams.Instigator = GetInstigator();
+    AWeapon* Spawner = GetWorld()->SpawnActor<AWeapon>(SpawnWeapon, SpawnParams);
+
+    if (Spawner)
+    {
+        Spawner->AttachToComponent(CameraComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+        CurrentWeapon = Spawner;
+        CurrentWeapon->SetActorRelativeLocation(WeaponOffset);
+    }
+
 }
 
 void APlayerCharacter::Tick(float DeltaTime)
@@ -77,8 +94,8 @@ void APlayerCharacter::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
 
     FRotator CameraRotation = GetController()->GetControlRotation();
-    FRotator TargetRotation = FRotator(CameraRotation.Pitch, CameraRotation.Yaw, CameraTargetRoll);
-    GetController()->SetControlRotation(FMath::RInterpTo(CameraRotation, TargetRotation, DeltaTime, 10.f));
+    FRotator CameraTargetRotation = FRotator(CameraRotation.Pitch, CameraRotation.Yaw, CameraTargetRoll);
+    GetController()->SetControlRotation(FMath::RInterpTo(CameraRotation, CameraTargetRotation, DeltaTime, 10.f));
 
     CameraComponent->FieldOfView = FMath::FInterpTo(CameraComponent->FieldOfView, TargetFieldOfView, DeltaTime, 5.f);
 
@@ -86,18 +103,16 @@ void APlayerCharacter::Tick(float DeltaTime)
         GetController()->SetControlRotation(FRotator(CameraRotation.Pitch, CameraRotation.Yaw, CalculateViewRoll()));
 
     // Weapon swaying
-    /*
     if (CurrentWeapon) {
 
-        float SwayXFactor = -GetInputAxisValue("turn") * 2.0f;
-        float SwayYFactor = GetInputAxisValue("lookup") * 2.0f + -(CameraComponent->GetComponentRotation().Pitch / 67.5f);
-        UE_LOG(LogTemp, Warning, TEXT("%f"), CameraComponent->GetComponentRotation().Pitch);
+        float SwayXFactor = -GetInputAxisValue("turn") * ViewSwayAmount;
+        float SwayYFactor = GetInputAxisValue("lookup") * ViewSwayAmount + -(CameraComponent->GetComponentRotation().Pitch / 67.5f);
 
-        float MaxSway = 5.f;
+        float MaxSway = MaxWeaponSway;
         float SwaySmooth = 5.0f;
 
-        float LeadXFactor = GetInputAxisValue("turn") * 1.0f;
-        float LeadYFactor = -GetInputAxisValue("lookup") * 1.0f;
+        float LeadXFactor = GetInputAxisValue("turn") * ViewWeaponLeadAmount;
+        float LeadYFactor = -GetInputAxisValue("lookup") * ViewWeaponLeadAmount;
 
         SwayXFactor = FMath::Clamp(SwayXFactor, -MaxSway, MaxSway);
         SwayYFactor = FMath::Clamp(SwayYFactor, -MaxSway, MaxSway);
@@ -113,9 +128,7 @@ void APlayerCharacter::Tick(float DeltaTime)
         const FRotator RelativeRotation = CameraComponent->GetComponentTransform().InverseTransformRotation(CurrentWeapon->GetActorRotation().Quaternion()).Rotator();
         const FRotator ResultRotation = FMath::RInterpTo(RelativeRotation, TargetRotation, DeltaTime, SwaySmooth);
         CurrentWeapon->SetActorRelativeRotation(ResultRotation);
-
     }
-*/
 }
 
 void APlayerCharacter::MoveForward(float Value)
@@ -510,6 +523,14 @@ float APlayerCharacter::CalculateViewRoll()
 	return Side*Sign;
 }
 
+void APlayerCharacter::FireWeapon()
+{
+    if (CurrentWeapon)
+    {
+        CurrentWeapon->Fire();
+    }
+}
+
 void APlayerCharacter::OnComponentHit(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, FVector NormalImpulse, const FHitResult & Hit)
 {
     if (!bIsWallRunning && CanSurfaceBeWallRan(Hit.ImpactNormal) && MovementPtr->IsFalling())
@@ -533,6 +554,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
 
     PlayerInputComponent->BindAction("sprint", IE_Pressed, this, &APlayerCharacter::Sprint);
     PlayerInputComponent->BindAction("sprint", IE_Released, this, &APlayerCharacter::StopSprinting);
+
+    PlayerInputComponent->BindAction("shoot", IE_Pressed, this, &APlayerCharacter::FireWeapon);
 
     PlayerInputComponent->BindAxis("forward", this, &APlayerCharacter::MoveForward);
     PlayerInputComponent->BindAxis("right", this, &APlayerCharacter::MoveRight);
