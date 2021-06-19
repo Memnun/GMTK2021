@@ -79,6 +79,8 @@ void APlayerCharacter::BeginPlay()
 
     GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &APlayerCharacter::OnComponentHit);
 
+
+    // Spawn in weapon view model
     FActorSpawnParameters SpawnParams;
     SpawnParams.Owner = this;
     SpawnParams.Instigator = GetInstigator();
@@ -110,7 +112,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 
     CameraComponent->FieldOfView = FMath::FInterpTo(CameraComponent->FieldOfView, TargetFieldOfView, DeltaTime, 5.f);
 
-    if (!bIsWallRunning)
+    if (!bIsWallRunning && MovementPtr->IsWalking())
         GetController()->SetControlRotation(FRotator(CameraRotation.Pitch, CameraRotation.Yaw, CalculateViewRoll()));
 
     // Weapon swaying
