@@ -116,32 +116,7 @@ void APlayerCharacter::Tick(float DeltaTime)
         GetController()->SetControlRotation(FRotator(CameraRotation.Pitch, CameraRotation.Yaw, CalculateViewRoll()));
 
     // Weapon swaying
-    if (CurrentWeapon) {
-
-        float SwayXFactor = -GetInputAxisValue("turn") * ViewSwayAmount;
-        float SwayYFactor = GetInputAxisValue("lookup") * ViewSwayAmount + -(CameraComponent->GetComponentRotation().Pitch / 67.5f);
-
-        float MaxSway = MaxWeaponSway;
-        float SwaySmooth = 5.0f;
-
-        float LeadXFactor = GetInputAxisValue("turn") * ViewWeaponLeadAmount;
-        float LeadYFactor = -GetInputAxisValue("lookup") * ViewWeaponLeadAmount;
-
-        SwayXFactor = FMath::Clamp(SwayXFactor, -MaxSway, MaxSway);
-        SwayYFactor = FMath::Clamp(SwayYFactor, -MaxSway, MaxSway);
-        LeadXFactor = FMath::Clamp(LeadXFactor, -MaxSway, MaxSway);
-        LeadYFactor = FMath::Clamp(LeadYFactor, -MaxSway, MaxSway);
-
-        const FVector TargetLocation = FVector(0, SwayXFactor, SwayYFactor) + WeaponOffset;
-        const FVector RelativeLocation = CameraComponent->GetComponentTransform().InverseTransformPosition(CurrentWeapon->GetActorLocation());
-        const FVector ResultLocation = FMath::VInterpTo(RelativeLocation, TargetLocation, DeltaTime, SwaySmooth);
-        CurrentWeapon->SetActorRelativeLocation(ResultLocation);
-
-        const FRotator TargetRotation = FRotator(LeadYFactor, LeadXFactor, 0);
-        const FRotator RelativeRotation = CameraComponent->GetComponentTransform().InverseTransformRotation(CurrentWeapon->GetActorRotation().Quaternion()).Rotator();
-        const FRotator ResultRotation = FMath::RInterpTo(RelativeRotation, TargetRotation, DeltaTime, SwaySmooth);
-        CurrentWeapon->SetActorRelativeRotation(ResultRotation);
-    }
+    CalculateWeaponSway(DeltaTime);
 }
 
 void APlayerCharacter::MoveForward(float Value)
@@ -562,6 +537,37 @@ float APlayerCharacter::CalculateViewBob()
     Bob = FMath::Sin(Cycle * BobSpeed) * BobAmount * VelocityLength;
 
     return Bob;
+}
+
+void APlayerCharacter::CalculateWeaponSway(float DeltaTime)
+{
+    if (CurrentWeapon)
+    {
+
+        float SwayXFactor = -GetInputAxisValue("turn") * ViewSwayAmount;
+        float SwayZFactor = GetInputAxisValue("lookup") * ViewSwayAmount + -(CameraComponent->GetComponentRotation().Pitch / 67.5f) - (MovementPtr->Velocity.Z / 130.f);
+
+        float MaxSway = MaxWeaponSway;
+        float SwaySmooth = 5.0f;
+
+        float LeadXFactor = GetInputAxisValue("turn") * ViewWeaponLeadAmount;
+        float LeadYFactor = -GetInputAxisValue("lookup") * ViewWeaponLeadAmount;
+
+        SwayXFactor = FMath::Clamp(SwayXFactor, -MaxSway, MaxSway);
+        SwayZFactor = FMath::Clamp(SwayZFactor, -MaxSway, MaxSway);
+        LeadXFactor = FMath::Clamp(LeadXFactor, -MaxSway, MaxSway);
+        LeadYFactor = FMath::Clamp(LeadYFactor, -MaxSway, MaxSway);
+
+        const FVector TargetLocation = FVector(0, SwayXFactor, SwayZFactor) + WeaponOffset;
+        const FVector RelativeLocation = CameraComponent->GetComponentTransform().InverseTransformPosition(CurrentWeapon->GetActorLocation());
+        const FVector ResultLocation = FMath::VInterpTo(RelativeLocation, TargetLocation, DeltaTime, SwaySmooth);
+        CurrentWeapon->SetActorRelativeLocation(ResultLocation);
+
+        const FRotator TargetRotation = FRotator(LeadYFactor, LeadXFactor, 0);
+        const FRotator RelativeRotation = CameraComponent->GetComponentTransform().InverseTransformRotation(CurrentWeapon->GetActorRotation().Quaternion()).Rotator();
+        const FRotator ResultRotation = FMath::RInterpTo(RelativeRotation, TargetRotation, DeltaTime, SwaySmooth);
+        CurrentWeapon->SetActorRelativeRotation(ResultRotation);
+    }
 }
 
 void APlayerCharacter::FireWeapon()
