@@ -6,6 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
 #include "DrawDebugHelpers.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AWeapon::AWeapon()
@@ -75,9 +76,12 @@ void AWeapon::HitScanFire()
     FCollisionQueryParams TraceParams;
     GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, TraceParams);
 
-    DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 5.0f);
-
-    GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Yellow, TEXT("Hit scan!"));
+    if (Hit.bBlockingHit && Hit.GetActor())
+    {
+        TSubclassOf<UDamageType> DamageType;
+        UGameplayStatics::ApplyDamage(Hit.GetActor(), 10.f, GetInstigator()->GetController(), GetInstigator(), DamageType);
+    }
+    //DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 5.0f);
 }
 
 void AWeapon::ProjectileFire()
