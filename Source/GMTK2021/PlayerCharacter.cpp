@@ -572,6 +572,14 @@ void APlayerCharacter::FireWeapon()
     }
 }
 
+void APlayerCharacter::StopFireWeapon()
+{
+    if (CurrentWeapon)
+    {
+        CurrentWeapon->StopFire();
+    }
+}
+
 void APlayerCharacter::OnComponentHit(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, FVector NormalImpulse, const FHitResult & Hit)
 {
     if (!bIsWallRunning && CanSurfaceBeWallRan(Hit.ImpactNormal) && MovementPtr->IsFalling())
@@ -597,6 +605,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
     PlayerInputComponent->BindAction("sprint", IE_Released, this, &APlayerCharacter::StopSprinting);
 
     PlayerInputComponent->BindAction("shoot", IE_Pressed, this, &APlayerCharacter::FireWeapon);
+    PlayerInputComponent->BindAction("shoot", IE_Released, this, &APlayerCharacter::StopFireWeapon);
 
     PlayerInputComponent->BindAxis("forward", this, &APlayerCharacter::MoveForward);
     PlayerInputComponent->BindAxis("right", this, &APlayerCharacter::MoveRight);

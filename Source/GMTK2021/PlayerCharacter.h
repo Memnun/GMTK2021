@@ -185,6 +185,9 @@ protected:
     UFUNCTION()
     void FireWeapon();
 
+    UFUNCTION()
+    void StopFireWeapon();
+
     UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Player|Camera")
     float BaseTurnRate;
 

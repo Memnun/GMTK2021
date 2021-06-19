@@ -23,6 +23,9 @@ struct FWeaponData
 
     UPROPERTY(EditDefaultsOnly, Category = Config)
     float TimeBetweenShots;
+
+    UPROPERTY(EditDefaultsOnly, Category = Config)
+    bool AutoFire;
 };
 
 UCLASS()
@@ -36,6 +39,9 @@ public:
 
 	UFUNCTION()
     void Fire();
+
+	UFUNCTION()
+    void StopFire();
 
 	UFUNCTION()
     void HitScanFire();
@@ -55,6 +61,12 @@ public:
 	class UStaticMeshComponent* WeaponMesh;
 
 protected:
+
+	UFUNCTION()
+    void ResetFire();
+
+	bool bCanFire;
+	bool bWantsToFire;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
