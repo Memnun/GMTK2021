@@ -62,6 +62,12 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
     float RollSpeed;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
+    float BobSpeed;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
+    float BobAmount;
+
     bool bIsWallRunning;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Controls)
@@ -172,6 +178,9 @@ protected:
 
     UFUNCTION()
     float CalculateViewRoll();
+
+    UFUNCTION()
+    float CalculateViewBob();
 
     UFUNCTION()
     void FireWeapon();

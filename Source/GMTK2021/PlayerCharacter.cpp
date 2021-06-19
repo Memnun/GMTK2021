@@ -35,6 +35,10 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
     MouseSensitivity = 1.f;
 
     RollAngle = 2.0f;
+    RollSpeed = 200.f;
+
+    BobSpeed = 0.6f;
+    BobAmount = 0.2f;
 
     MovementPtr = Cast<UPlayerMovement>(ACharacter::GetMovementComponent());
 
@@ -93,9 +97,16 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
+
     FRotator CameraRotation = GetController()->GetControlRotation();
     FRotator CameraTargetRotation = FRotator(CameraRotation.Pitch, CameraRotation.Yaw, CameraTargetRoll);
     GetController()->SetControlRotation(FMath::RInterpTo(CameraRotation, CameraTargetRotation, DeltaTime, 10.f));
+
+    FVector CameraOffset = CameraComponent->GetRelativeLocation();
+    CameraOffset.Z = CalculateViewBob();
+    CameraComponent->SetRelativeLocation(CameraOffset);
+
+    //GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Blue, FString::Printf(TEXT("%f"), CalculateViewRoll()));
 
     CameraComponent->FieldOfView = FMath::FInterpTo(CameraComponent->FieldOfView, TargetFieldOfView, DeltaTime, 5.f);
 
@@ -509,9 +520,13 @@ float APlayerCharacter::CalculateViewRoll()
     float	Side;
     float	Value;
 
+    if (MovementPtr->Velocity.SizeSquared() < KINDA_SMALL_NUMBER)
+        return 0;
+
     Side = FVector::DotProduct(MovementPtr->Velocity, GetActorRightVector());
     Sign = Side < 0 ? -1 : 1;
     Side = FMath::Abs(Side);
+
 
     Value = RollAngle;
 
@@ -521,6 +536,30 @@ float APlayerCharacter::CalculateViewRoll()
 		Side = Value;
 	
 	return Side*Sign;
+}
+
+float APlayerCharacter::CalculateViewBob()
+{
+    float Time = FPlatformTime::ToSeconds(FPlatformTime::Cycles());
+    float Bob;
+    float Cycle;
+    float VelocityLength;
+
+    VelocityLength = MovementPtr->Velocity.Size2D() / MovementPtr->GetMaxSpeed();
+
+    if (VelocityLength < KINDA_SMALL_NUMBER)
+        return 0;
+
+    if (!MovementPtr->IsWalking())
+        return 0;
+
+    Cycle = Time * (2 * PI) * BobSpeed;
+
+    //GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Blue, FString::Printf(TEXT("%f"), Cycle));
+
+    Bob = FMath::Sin(Cycle * BobSpeed) * BobAmount * VelocityLength;
+
+    return Bob;
 }
 
 void APlayerCharacter::FireWeapon()
