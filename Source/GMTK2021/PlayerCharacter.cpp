@@ -545,7 +545,7 @@ void APlayerCharacter::CalculateWeaponSway(float DeltaTime)
     {
 
         float SwayXFactor = -GetInputAxisValue("turn") * ViewSwayAmount;
-        float SwayZFactor = GetInputAxisValue("lookup") * ViewSwayAmount + -(CameraComponent->GetComponentRotation().Pitch / 67.5f) - (MovementPtr->Velocity.Z / 130.f);
+        float SwayZFactor = (GetInputAxisValue("lookup") + -(CameraComponent->GetComponentRotation().Pitch / 67.5f) - (MovementPtr->Velocity.Z / 300.f)) * ViewSwayAmount;
 
         float MaxSway = MaxWeaponSway;
         float SwaySmooth = 5.0f;
