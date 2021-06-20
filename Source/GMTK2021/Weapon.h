@@ -25,6 +25,9 @@ struct FWeaponData
     float TimeBetweenShots;
 
     UPROPERTY(EditDefaultsOnly, Category = Config)
+    float InFireDelay;
+
+    UPROPERTY(EditDefaultsOnly, Category = Config)
     bool AutoFire;
 };
 
@@ -39,6 +42,9 @@ public:
 
 	UFUNCTION()
     void Fire();
+
+	UFUNCTION()
+    void TryFire();
 
 	UFUNCTION()
     void StopFire();

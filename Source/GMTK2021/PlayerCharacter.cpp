@@ -574,7 +574,7 @@ void APlayerCharacter::FireWeapon()
 {
     if (CurrentWeapon)
     {
-        CurrentWeapon->Fire();
+        CurrentWeapon->TryFire();
     }
 }
 

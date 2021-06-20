@@ -40,24 +40,41 @@ void AWeapon::Tick(float DeltaTime)
 
 void AWeapon::Fire()
 {
+    switch (ProjectileType)
+    {
+    case EWeaponProjectile::ProjectileType::EHitScan:
+        HitScanFire();
+        break;
+    case EWeaponProjectile::ProjectileType::EProjectile:
+        ProjectileFire();
+        break;
+    }
+
+    FTimerHandle ShootDelayHandle;
+    GetWorld()->GetTimerManager().SetTimer(ShootDelayHandle, this, &AWeapon::ResetFire, WeaponConfig.TimeBetweenShots);
+}
+
+void AWeapon::TryFire()
+{
     if (bCanFire)
     {
         bWantsToFire = true;
 
-        switch (ProjectileType)
+        if (WeaponConfig.InFireDelay > 0)
         {
-        case EWeaponProjectile::ProjectileType::EHitScan:
-            HitScanFire();
-            break;
-        case EWeaponProjectile::ProjectileType::EProjectile:
-            ProjectileFire();
-            break;
+            // Delayed fire
+            FTimerHandle DelayedShootHandle;
+            GetWorld()->GetTimerManager().SetTimer(DelayedShootHandle, this, &AWeapon::Fire, WeaponConfig.InFireDelay);
+        }
+        else
+        {
+            // Instant fire
+            Fire();
         }
 
-        FTimerHandle ShootDelayHandle;
-        GetWorld()->GetTimerManager().SetTimer(ShootDelayHandle, this, &AWeapon::ResetFire, WeaponConfig.TimeBetweenShots);
+
         bCanFire = false;
-        
+
     }
 }
 
