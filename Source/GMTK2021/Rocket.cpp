@@ -6,6 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 ARocket::ARocket()
@@ -39,9 +40,9 @@ void ARocket::OnComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherAct
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.f, GetActorLocation());
 
         TSubclassOf<UDamageType> DamageType;
-		TArray<AActor*> IgnoreList;
-		UGameplayStatics::ApplyRadialDamage(GetWorld(), 50.0f, Hit.Location, 600.0f, DamageType, IgnoreList);
-
+		TArray<AActor*> IgnoredActors;
+        UGameplayStatics::ApplyRadialDamageWithFalloff(GetWorld(), 50.f, 1, GetActorLocation(), 0.f, 250.f, 5.f, DamageType, IgnoredActors);
+		DrawDebugSphere(GetWorld(), GetActorLocation(), 250.f, 32, FColor::Red, false, 4);
 		Destroy();
 	}
 }
