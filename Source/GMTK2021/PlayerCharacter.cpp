@@ -104,10 +104,6 @@ void APlayerCharacter::Tick(float DeltaTime)
     FRotator CameraTargetRotation = FRotator(CameraRotation.Pitch, CameraRotation.Yaw, CameraTargetRoll);
     GetController()->SetControlRotation(FMath::RInterpTo(CameraRotation, CameraTargetRotation, DeltaTime, 10.f));
 
-    FVector CameraOffset = CameraComponent->GetRelativeLocation();
-    CameraOffset.Z = CalculateViewBob();
-    CameraComponent->SetRelativeLocation(CameraOffset);
-
     //GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Blue, FString::Printf(TEXT("%f"), CalculateViewRoll()));
 
     CameraComponent->FieldOfView = FMath::FInterpTo(CameraComponent->FieldOfView, TargetFieldOfView, DeltaTime, 5.f);
@@ -515,37 +511,39 @@ float APlayerCharacter::CalculateViewRoll()
 	return Side*Sign;
 }
 
-float APlayerCharacter::CalculateViewBob()
-{
-    float Time = FPlatformTime::ToSeconds(FPlatformTime::Cycles());
-    float Bob;
-    float Cycle;
-    float VelocityLength;
-
-    VelocityLength = MovementPtr->Velocity.Size2D() / MovementPtr->GetMaxSpeed();
-
-    if (VelocityLength < KINDA_SMALL_NUMBER)
-        return 0;
-
-    if (!MovementPtr->IsWalking())
-        return 0;
-
-    Cycle = Time * (2 * PI) * BobSpeed;
-
-    //GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Blue, FString::Printf(TEXT("%f"), Cycle));
-
-    Bob = FMath::Sin(Cycle * BobSpeed) * BobAmount * VelocityLength;
-
-    return Bob;
-}
-
 void APlayerCharacter::CalculateWeaponSway(float DeltaTime)
 {
     if (CurrentWeapon)
     {
+        // Weapon bobbing as you run
+        float Time = FPlatformTime::ToSeconds(FPlatformTime::Cycles());
+        float XBob = 0;
+        float YBob = 0;
+        float Cycle;
+        float VelocityLength;
 
-        float SwayXFactor = -GetInputAxisValue("turn") * ViewSwayAmount;
-        float SwayZFactor = (GetInputAxisValue("lookup") + -(CameraComponent->GetComponentRotation().Pitch / 67.5f) - (MovementPtr->Velocity.Z / 300.f)) * ViewSwayAmount;
+        float SwayXFactor;
+        float SwayYFactor;
+        float SwayZFactor;
+
+        VelocityLength = MovementPtr->Velocity.Size2D() / MovementPtr->GetMaxSpeed();
+
+        if (VelocityLength > KINDA_SMALL_NUMBER && MovementPtr->IsWalking())
+        {
+            Cycle = Time * (2 * PI) * BobSpeed;
+
+            //GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Blue, FString::Printf(TEXT("%f"), Cycle));
+
+            XBob = FMath::Sin(Cycle * BobSpeed) * BobAmount * VelocityLength;
+            YBob = FMath::Cos(Cycle * BobSpeed / 2) * (BobAmount * 2.f) * VelocityLength;
+        }
+
+        // Weapon swaying as you turn
+        SwayYFactor = -GetInputAxisValue("turn") * ViewSwayAmount;
+        SwayZFactor = (GetInputAxisValue("lookup") + -(CameraComponent->GetComponentRotation().Pitch / 67.5f) - (MovementPtr->Velocity.Z / 300.f)) * ViewSwayAmount;
+
+        SwayXFactor = XBob;
+        SwayYFactor -= YBob;
 
         float MaxSway = MaxWeaponSway;
         float SwaySmooth = 5.0f;
@@ -554,11 +552,12 @@ void APlayerCharacter::CalculateWeaponSway(float DeltaTime)
         float LeadYFactor = -GetInputAxisValue("lookup") * ViewWeaponLeadAmount;
 
         SwayXFactor = FMath::Clamp(SwayXFactor, -MaxSway, MaxSway);
+        SwayYFactor = FMath::Clamp(SwayYFactor, -MaxSway, MaxSway);
         SwayZFactor = FMath::Clamp(SwayZFactor, -MaxSway, MaxSway);
         LeadXFactor = FMath::Clamp(LeadXFactor, -MaxSway, MaxSway);
         LeadYFactor = FMath::Clamp(LeadYFactor, -MaxSway, MaxSway);
 
-        const FVector TargetLocation = FVector(0, SwayXFactor, SwayZFactor) + WeaponOffset;
+        const FVector TargetLocation = FVector(SwayXFactor, SwayYFactor, SwayZFactor) + WeaponOffset;
         const FVector RelativeLocation = CameraComponent->GetComponentTransform().InverseTransformPosition(CurrentWeapon->GetActorLocation());
         const FVector ResultLocation = FMath::VInterpTo(RelativeLocation, TargetLocation, DeltaTime, SwaySmooth);
         CurrentWeapon->SetActorRelativeLocation(ResultLocation);
@@ -586,7 +585,7 @@ void APlayerCharacter::StopFireWeapon()
     }
 }
 
-void APlayerCharacter::OnComponentHit(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, FVector NormalImpulse, const FHitResult & Hit)
+void APlayerCharacter::OnComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
     if (!bIsWallRunning && CanSurfaceBeWallRan(Hit.ImpactNormal) && MovementPtr->IsFalling())
     {
@@ -600,7 +599,7 @@ void APlayerCharacter::OnComponentHit(UPrimitiveComponent * HitComponent, AActor
 }
 
 // Called to bind functionality to input
-void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
+void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 
@@ -620,7 +619,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputCo
     PlayerInputComponent->BindAxis("lookup", this, &APlayerCharacter::LookUp);
 }
 
-void APlayerCharacter::Landed(const FHitResult & Hit)
+void APlayerCharacter::Landed(const FHitResult& Hit)
 {
     Super::Landed(Hit);
 

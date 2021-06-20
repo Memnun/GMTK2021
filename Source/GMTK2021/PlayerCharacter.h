@@ -180,9 +180,6 @@ protected:
     float CalculateViewRoll();
 
     UFUNCTION()
-    float CalculateViewBob();
-
-    UFUNCTION()
     void CalculateWeaponSway(float DeltaTime);
 
     UFUNCTION()
