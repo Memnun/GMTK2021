@@ -7,6 +7,7 @@
 #include "Components/BoxComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
+#include "Rocket.h"
 
 // Sets default values
 AWeapon::AWeapon()
@@ -49,6 +50,7 @@ void AWeapon::Fire()
             HitScanFire();
             break;
         case EWeaponProjectile::ProjectileType::EProjectile:
+            ProjectileFire();
             break;
         }
 
@@ -86,6 +88,18 @@ void AWeapon::HitScanFire()
 
 void AWeapon::ProjectileFire()
 {
+    FVector Location = WeaponMesh->GetSocketLocation(TEXT("Muzzle"));
+    FRotator Rotation = WeaponMesh->GetSocketRotation(TEXT("Muzzle"));
+
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.Owner = this;
+    SpawnParams.Instigator = GetInstigator();
+    const ARocket* SpawnedRocket = GetWorld()->SpawnActor<ARocket>(RocketProjectile, Location, Rotation, SpawnParams);
+
+    if (SpawnedRocket)
+    {
+
+    }
 }
 
 void AWeapon::StopFire()

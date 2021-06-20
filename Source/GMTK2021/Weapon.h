@@ -52,6 +52,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = Config)
 	FWeaponData WeaponConfig;
 
+	UPROPERTY(EditAnywhere, Category = Config)
 	TEnumAsByte<EWeaponProjectile::ProjectileType> ProjectileType;
 
 	UPROPERTY(EditAnywhere)
@@ -59,6 +60,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* WeaponMesh;
+
+    UPROPERTY(EditDefaultsOnly, Category = Projectile)
+    TSubclassOf<class ARocket> RocketProjectile;
 
 protected:
 
