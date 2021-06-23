@@ -302,8 +302,8 @@ void APlayerCharacter::UpdateWallRun()
         return;
     }
 
-    MovementPtr->Velocity.X = WallRunDirection.X * MovementPtr->GetMaxSpeed();
-    MovementPtr->Velocity.Y = WallRunDirection.Y * MovementPtr->GetMaxSpeed();
+    MovementPtr->Velocity.X = WallRunDirection.X * MovementPtr->GetMaxSpeed() * 1.5f;
+    MovementPtr->Velocity.Y = WallRunDirection.Y * MovementPtr->GetMaxSpeed() * 1.5f;
 }
 
 void APlayerCharacter::EndWallRun(EWallRunEndReason Reason)
