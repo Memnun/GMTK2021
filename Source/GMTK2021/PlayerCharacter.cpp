@@ -352,7 +352,9 @@ void APlayerCharacter::FindRunDirectionAndSide(FVector WallNormal)
 
 bool APlayerCharacter::CanSurfaceBeWallRan(FVector SurfaceNormal) const
 {
-    bool Result = false;
+    float WallFaceAngle;
+    FVector SurfaceXYNormalized;
+    float SurfaceAngle;
 
     // Check if surface is a ceiling
     if (SurfaceNormal.Z < -0.05f)
@@ -360,16 +362,21 @@ bool APlayerCharacter::CanSurfaceBeWallRan(FVector SurfaceNormal) const
         return false;
     }
 
-    FVector SurfaceXYNormalized = SurfaceNormal.GetSafeNormal2D();
-    float SurfaceAngle = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(SurfaceXYNormalized, SurfaceNormal)));
+    WallFaceAngle = FMath::Abs(FVector::DotProduct(SurfaceNormal, GetActorForwardVector()));
+    if (WallFaceAngle > .75f)
+    {
+        return false;
+    }
+
+    SurfaceXYNormalized = SurfaceNormal.GetSafeNormal2D();
+    SurfaceAngle = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(SurfaceXYNormalized, SurfaceNormal)));
 
     if (SurfaceAngle < MovementPtr->GetWalkableFloorAngle())
     {
-        Result = true;
+        return true;
     }
 
-
-    return Result;
+    return false;
 }
 
 FVector APlayerCharacter::FindLaunchVelocity()
