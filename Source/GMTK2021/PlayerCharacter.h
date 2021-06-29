@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "AttachmentPickup.h"
 
 #include "PlayerCharacter.generated.h"
 
@@ -13,6 +14,7 @@ class USpringArmComponent;
 class UBoxComponent;
 class AController;
 class AWeapon;
+class AAttachmentPickup;
 
 UENUM()
 enum EWallRunSide {
@@ -80,6 +82,9 @@ public:
     TSubclassOf<AWeapon> SpawnWeapon;
 
     AWeapon* CurrentWeapon;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attachments")
+    TMap<EAttachmentClass, AAttachmentPickup*> Attachments;
 
 private:
 
