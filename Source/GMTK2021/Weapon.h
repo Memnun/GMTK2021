@@ -29,6 +29,9 @@ struct FWeaponData
 
     UPROPERTY(EditDefaultsOnly, Category = Config)
     bool AutoFire;
+
+    UPROPERTY(EditDefaultsOnly, Category = Config)
+    int32 MaxAmmo;
 };
 
 UCLASS()
@@ -45,6 +48,12 @@ public:
 
 	UFUNCTION()
     void TryFire();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Weapon)
+    void OnFireEvent();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Weapon)
+    void OnStopFireEvent();
 
 	UFUNCTION()
     void StopFire();
@@ -69,6 +78,9 @@ public:
 
     UPROPERTY(EditDefaultsOnly, Category = Projectile)
     TSubclassOf<class ARocket> RocketProjectile;
+
+	UPROPERTY(BlueprintReadOnly, Category = Weapon)
+	int32 CurrentAmmo;
 
 protected:
 

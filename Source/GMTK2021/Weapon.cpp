@@ -29,6 +29,7 @@ void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 	
+    CurrentAmmo = WeaponConfig.MaxAmmo;
 }
 
 // Called every frame
@@ -50,13 +51,17 @@ void AWeapon::Fire()
         break;
     }
 
+    CurrentAmmo--;
+
     FTimerHandle ShootDelayHandle;
     GetWorld()->GetTimerManager().SetTimer(ShootDelayHandle, this, &AWeapon::ResetFire, WeaponConfig.TimeBetweenShots);
+
+    OnFireEvent();
 }
 
 void AWeapon::TryFire()
 {
-    if (bCanFire)
+    if (bCanFire && CurrentAmmo > 0)
     {
         bWantsToFire = true;
 
@@ -122,6 +127,7 @@ void AWeapon::ProjectileFire()
 void AWeapon::StopFire()
 {
     bWantsToFire = false;
+    OnStopFireEvent();
 }
 
 void AWeapon::ResetFire()
