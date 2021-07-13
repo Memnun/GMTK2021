@@ -81,6 +81,10 @@ public:
 
     AWeapon* CurrentWeapon;
 
+    bool bCanWallRun;
+
+    bool bHasSpeedBoost;
+
 private:
 
     float NormalFieldOfView;
