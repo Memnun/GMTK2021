@@ -41,13 +41,14 @@ public:
 
 	/*Whether or not this is an effect that has to be removed later*/
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Pickup")
-		bool bPersistant = true;
+		bool bPersistant = false;
 
 	/* If higher than 0 for a persistent effect, will automatically remove the effect after this value in seconds*/
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Pickup")
 		float Duration = -1.f;
 
 	/*********************************** Effect Implementation ************************************/
+
 
 	UFUNCTION(BlueprintCallable, Category = "Pickup")
 		void BeginApplyPickup();
@@ -67,11 +68,14 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Pickup")
 		APlayerCharacter* Player = nullptr;
 
+	/*Overrideable function for handling behaviour of pickups with AutoPickup disabled*/
 	virtual void DeferredPickup() {}
+	/*Empty overrideable function for handling custom logic when a pickup's effect is applied*/
+	virtual void BeginApply_Internal() {}
+	/*Handles any end-of-effect processes for a class of pickup. Destroys the pickup by default*/
+	virtual void OnEffectEnd_Internal();
 private:
 	FTimerHandle ExpirationTimer;
-
-	UFUNCTION() void OnEffectEnd_Internal();
 
 	UFUNCTION()
 		void OnPickupOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

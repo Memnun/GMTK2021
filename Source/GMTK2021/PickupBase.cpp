@@ -35,6 +35,7 @@ void APickupBase::Tick(float DeltaTime)
 
 void APickupBase::BeginApplyPickup()
 {
+	BeginApply_Internal();
 	ApplyPickupEvent();
 	PickupRadius->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	RootMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -47,14 +48,14 @@ void APickupBase::BeginApplyPickup()
 	}
 	else
 	{
-		Destroy();
+		SetLifeSpan(.1f);
 	}
 }
 
 void APickupBase::OnEffectEnd_Internal()
 {
 	OnEffectEnd();
-	Destroy();
+	SetLifeSpan(.1f);
 }
 
 void APickupBase::OnPickupOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
