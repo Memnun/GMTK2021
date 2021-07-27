@@ -30,6 +30,7 @@ void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const clas
     if (Damage < 0)
         return;
 
-    Health = FMath::Clamp<float>(Health - Damage, 0.f, DefaultHealth);
+    float ModifiedDamage = FMath::Max(Damage - Armor, 0.f);
+    Health = FMath::Clamp<float>(Health - ModifiedDamage, 0.f, DefaultHealth);
 }
 

@@ -13,6 +13,7 @@ APickupBase::APickupBase()
 
 	RootMesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	SetRootComponent(RootMesh);
+	RootMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	PickupRadius = CreateDefaultSubobject<USphereComponent>("PickupRadius");
 	PickupRadius->SetupAttachment(RootComponent);

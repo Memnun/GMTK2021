@@ -103,7 +103,7 @@ void AWeapon::HitScanFire()
     if (Hit.bBlockingHit && Hit.GetActor())
     {
         TSubclassOf<UDamageType> DamageType;
-        UGameplayStatics::ApplyDamage(Hit.GetActor(), 10.f, GetInstigator()->GetController(), GetInstigator(), DamageType);
+        UGameplayStatics::ApplyDamage(Hit.GetActor(), 10.f * DamageMultiplier, GetInstigator()->GetController(), GetInstigator(), DamageType);
     }
     //DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 5.0f);
 }

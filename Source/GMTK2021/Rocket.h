@@ -26,6 +26,8 @@ public:
 
 	UFUNCTION()
     void OnComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	float DamageMultiplier = 1.f;
 	
 protected:
 	// Called when the game starts or when spawned

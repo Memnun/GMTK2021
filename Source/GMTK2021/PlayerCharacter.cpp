@@ -12,6 +12,7 @@
 #include "Engine/Engine.h"
 #include "DrawDebugHelpers.h"
 #include "Weapon.h"
+#include "HealthComponent.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
@@ -41,6 +42,8 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
     BobAmount = 0.2f;
 
     MovementPtr = Cast<UPlayerMovement>(ACharacter::GetMovementComponent());
+
+    HealthComponent = CreateDefaultSubobject<UHealthComponent>("HealthComponent");
 
     CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
     CameraComponent->SetupAttachment(RootComponent);
@@ -81,17 +84,7 @@ void APlayerCharacter::BeginPlay()
 
 
     // Spawn in weapon view model
-    FActorSpawnParameters SpawnParams;
-    SpawnParams.Owner = this;
-    SpawnParams.Instigator = GetInstigator();
-    AWeapon* Spawner = GetWorld()->SpawnActor<AWeapon>(SpawnWeapon, SpawnParams);
-
-    if (Spawner)
-    {
-        Spawner->AttachToComponent(CameraComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-        CurrentWeapon = Spawner;
-        CurrentWeapon->SetActorRelativeLocation(WeaponOffset);
-    }
+    SetCurrentWeaponByClass(SpawnWeapon);
 
 }
 
@@ -220,7 +213,8 @@ bool APlayerCharacter::CanJumpInternal_Implementation() const
 
 void APlayerCharacter::Sprint()
 {
-    bIsSprinting = true;
+    if(bCanSpeedBoost)
+        bIsSprinting = true;
 }
 
 void APlayerCharacter::StopSprinting()
@@ -247,6 +241,7 @@ void APlayerCharacter::ResetJump(int Jumps)
 
 void APlayerCharacter::BeginWallRun()
 {
+    if(!bCanWallRun) return;
     bIsWallRunning = true;
     BeginCameraTilt();
     GetWorld()->GetTimerManager().SetTimer(WallRunHandle, this, &APlayerCharacter::UpdateWallRun, 0.05f, true);
@@ -590,6 +585,35 @@ void APlayerCharacter::StopFireWeapon()
     {
         CurrentWeapon->StopFire();
     }
+}
+
+AWeapon* APlayerCharacter::SetCurrentWeaponByClass_Implementation(TSubclassOf<AWeapon> NewWeaponClass)
+{
+    if(!NewWeaponClass->IsValidLowLevel()) return nullptr;
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = GetInstigator();
+	AWeapon* Spawner = GetWorld()->SpawnActor<AWeapon>(NewWeaponClass, SpawnParams);
+
+	if (Spawner)
+	{
+        AWeapon* OldWeapon = CurrentWeapon;
+		Spawner->AttachToComponent(CameraComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		CurrentWeapon = Spawner;
+		CurrentWeapon->SetActorRelativeLocation(WeaponOffset);
+        //Broadcast that the player's current weapon has changed, if any objects are listening for that
+        if(OnWeaponChanged.IsBound())
+            OnWeaponChanged.Broadcast(CurrentWeapon);
+
+        if(OldWeapon)
+		{
+			OldWeapon->SetActorHiddenInGame(true);
+			OldWeapon->SetLifeSpan(.001f);
+		}
+        return CurrentWeapon;
+	}
+    return CurrentWeapon;
 }
 
 void APlayerCharacter::OnComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

@@ -82,6 +82,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = Weapon)
 	int32 CurrentAmmo;
 
+	UPROPERTY(BlueprintReadWrite, Category = Weapon)
+	float DamageMultiplier = 1.f;
+
 protected:
 
 	UFUNCTION()

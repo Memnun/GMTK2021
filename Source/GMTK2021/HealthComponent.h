@@ -22,6 +22,9 @@ public:
     UPROPERTY(BlueprintReadOnly)
     float Health;
 
+    UPROPERTY(BlueprintReadWrite, VisibleInstanceOnly, Category = Health)
+    float Armor = 0.f;
+
 protected:
     // Called when the game starts
     virtual void BeginPlay() override;

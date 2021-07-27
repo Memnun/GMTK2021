@@ -41,7 +41,7 @@ void ARocket::OnComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherAct
 
         TSubclassOf<UDamageType> DamageType;
 		TArray<AActor*> IgnoredActors;
-        UGameplayStatics::ApplyRadialDamageWithFalloff(GetWorld(), 50.f, 1, GetActorLocation(), 0.f, 250.f, 5.f, DamageType, IgnoredActors);
+        UGameplayStatics::ApplyRadialDamageWithFalloff(GetWorld(), 50.f * DamageMultiplier, 1, GetActorLocation(), 0.f, 250.f, 5.f, DamageType, IgnoredActors);
 		DrawDebugSphere(GetWorld(), GetActorLocation(), 250.f, 32, FColor::Red, false, 4);
 		Destroy();
 	}

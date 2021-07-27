@@ -15,6 +15,7 @@ class UBoxComponent;
 class AController;
 class AWeapon;
 class AAttachmentPickup;
+class UHealthComponent;
 
 UENUM()
 enum EWallRunSide {
@@ -46,7 +47,7 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
     float MaxWeaponSway;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = WallRun)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WallRun)
     int MaxJumps;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = WallRun)
@@ -75,12 +76,19 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Controls)
     float MouseSensitivity;
 
+    UPROPERTY(BlueprintReadWrite, Category = "Movement")
+    bool bCanWallRun = false;
+
+    UPROPERTY(BlueprintReadWrite, Category = "Movement")
+    bool bCanSpeedBoost = false;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
     FVector WeaponOffset;
 
     UPROPERTY(EditAnywhere, Category = Spawn)
     TSubclassOf<AWeapon> SpawnWeapon;
 
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Weapon")
     AWeapon* CurrentWeapon;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attachments")
@@ -209,7 +217,18 @@ public:
 
     UPROPERTY(EditAnywhere)
     USpringArmComponent* SpringArmComponent;
-    
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    UHealthComponent* HealthComponent = nullptr;
+
+    /*Changes the currently equipped weapon to a new weapon class, */
+    UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon")
+    AWeapon* SetCurrentWeaponByClass(TSubclassOf<AWeapon> NewWeaponClass);
+
+    DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponChangedDelegate, AWeapon*, NewWeapon);
+    UPROPERTY(BlueprintAssignable, BlueprintReadOnly)
+    FOnWeaponChangedDelegate OnWeaponChanged;
+
     UFUNCTION()
     void OnComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
