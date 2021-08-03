@@ -91,10 +91,6 @@ public:
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Weapon")
     AWeapon* CurrentWeapon;
 
-    bool bCanWallRun;
-
-    bool bHasSpeedBoost;
-
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attachments")
     TMap<EAttachmentClass, AAttachmentPickup*> Attachments;
 
