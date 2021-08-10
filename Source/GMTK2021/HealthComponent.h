@@ -25,6 +25,10 @@ public:
     UPROPERTY(BlueprintReadWrite, VisibleInstanceOnly, Category = Health)
     float Armor = 0.f;
 
+    DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathDelegate);
+    UPROPERTY(BlueprintAssignable, Category = "Health")
+    FOnDeathDelegate OnDeath;
+
 protected:
     // Called when the game starts
     virtual void BeginPlay() override;

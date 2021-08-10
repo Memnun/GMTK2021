@@ -32,5 +32,11 @@ void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const clas
 
     float ModifiedDamage = FMath::Max(Damage - Armor, 0.f);
     Health = FMath::Clamp<float>(Health - ModifiedDamage, 0.f, DefaultHealth);
+
+    if (Health == 0.f)
+    {
+        if(OnDeath.IsBound())
+            OnDeath.Broadcast();
+    }
 }
 
