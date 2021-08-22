@@ -21,6 +21,8 @@ AWeapon::AWeapon()
 	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
 	WeaponMesh->SetupAttachment(BoxComponent);
 
+    WeaponOffset = FVector(20.f, 30.f, -40.f);
+
     bCanFire = true;
 }
 
@@ -103,7 +105,7 @@ void AWeapon::HitScanFire()
     if (Hit.bBlockingHit && Hit.GetActor())
     {
         TSubclassOf<UDamageType> DamageType;
-        UGameplayStatics::ApplyDamage(Hit.GetActor(), 10.f * DamageMultiplier, GetInstigator()->GetController(), GetInstigator(), DamageType);
+        UGameplayStatics::ApplyDamage(Hit.GetActor(), WeaponConfig.Damage * DamageMultiplier, GetInstigator()->GetController(), GetInstigator(), DamageType);
     }
     //DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 5.0f);
 }

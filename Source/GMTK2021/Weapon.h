@@ -16,6 +16,7 @@ namespace EWeaponProjectile
     };
 }
 
+// XXX This doesn't really need to exist as a struct does it?
 USTRUCT()
 struct FWeaponData
 {
@@ -32,6 +33,9 @@ struct FWeaponData
 
     UPROPERTY(EditDefaultsOnly, Category = Config)
     int32 MaxAmmo;
+
+    UPROPERTY(EditDefaultsOnly, Category = Config)
+    float Damage = 10.f;
 };
 
 UCLASS()
@@ -84,6 +88,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, Category = Weapon)
 	float DamageMultiplier = 1.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+    FVector WeaponOffset;
 
 protected:
 

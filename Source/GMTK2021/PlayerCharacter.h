@@ -82,9 +82,6 @@ public:
     UPROPERTY(BlueprintReadWrite, Category = "Movement")
     bool bCanSpeedBoost = false;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
-    FVector WeaponOffset;
-
     UPROPERTY(EditAnywhere, Category = Spawn)
     TSubclassOf<AWeapon> SpawnWeapon;
 
@@ -93,6 +90,9 @@ public:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attachments")
     TMap<EAttachmentClass, AAttachmentPickup*> Attachments;
+
+    UPROPERTY(BlueprintReadOnly)
+    FVector WeaponOffset;
 
 private:
 

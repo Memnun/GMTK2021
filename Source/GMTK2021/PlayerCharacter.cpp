@@ -61,6 +61,8 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
     ViewWeaponLeadAmount = 2.0f;
     MaxWeaponSway = 2.5f;
 
+    WeaponOffset = FVector(0);
+
     /*
     SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("Weapon Spring Arm"));
     SpringArmComponent->bEnableCameraRotationLag = true;
@@ -598,6 +600,8 @@ AWeapon* APlayerCharacter::SetCurrentWeaponByClass_Implementation(TSubclassOf<AW
 
 	if (Spawner)
 	{
+        WeaponOffset = Spawner->WeaponOffset;
+
         AWeapon* OldWeapon = CurrentWeapon;
 		Spawner->AttachToComponent(CameraComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		CurrentWeapon = Spawner;
