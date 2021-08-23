@@ -20,91 +20,105 @@ namespace EWeaponProjectile
 USTRUCT()
 struct FWeaponData
 {
-	GENERATED_USTRUCT_BODY()
+    GENERATED_USTRUCT_BODY()
+
+        UPROPERTY(EditDefaultsOnly, Category = Config)
+        float TimeBetweenShots;
 
     UPROPERTY(EditDefaultsOnly, Category = Config)
-    float TimeBetweenShots;
+        float InFireDelay;
 
     UPROPERTY(EditDefaultsOnly, Category = Config)
-    float InFireDelay;
+        bool AutoFire;
 
     UPROPERTY(EditDefaultsOnly, Category = Config)
-    bool AutoFire;
+        int32 MaxAmmo;
 
     UPROPERTY(EditDefaultsOnly, Category = Config)
-    int32 MaxAmmo;
-
-    UPROPERTY(EditDefaultsOnly, Category = Config)
-    float Damage = 10.f;
+        float Damage = 10.f;
 };
 
 UCLASS()
 class GMTK2021_API AWeapon : public AActor
 {
-	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	AWeapon();
+    GENERATED_BODY()
 
-	UFUNCTION()
-    void Fire();
+public:
+    // Sets default values for this actor's properties
+    AWeapon();
 
-	UFUNCTION()
-    void TryFire();
+    UFUNCTION()
+        void Fire();
 
-	UFUNCTION(BlueprintImplementableEvent, Category = Weapon)
-    void OnFireEvent();
+    UFUNCTION()
+        void TryFire();
 
-	UFUNCTION(BlueprintImplementableEvent, Category = Weapon)
-    void OnStopFireEvent();
+    UFUNCTION(BlueprintImplementableEvent, Category = Weapon)
+        void OnFireEvent();
 
-	UFUNCTION()
-    void StopFire();
+    UFUNCTION(BlueprintImplementableEvent, Category = Weapon)
+        void OnStopFireEvent();
 
-	UFUNCTION()
-    void HitScanFire();
+    UFUNCTION()
+        void StopFire();
 
-	UFUNCTION()
-    void ProjectileFire();
+    UFUNCTION()
+        void HitScanFire();
 
-	UPROPERTY(EditAnywhere, Category = Config)
-	FWeaponData WeaponConfig;
+    UFUNCTION()
+        void ProjectileFire();
 
-	UPROPERTY(EditAnywhere, Category = Config)
-	TEnumAsByte<EWeaponProjectile::ProjectileType> ProjectileType;
+    UFUNCTION()
+        void Recoil();
 
-	UPROPERTY(EditAnywhere)
-	class UBoxComponent* BoxComponent;
+    UPROPERTY(EditAnywhere, Category = Config)
+        FWeaponData WeaponConfig;
 
-	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* WeaponMesh;
+    UPROPERTY(EditAnywhere, Category = Config)
+        TEnumAsByte<EWeaponProjectile::ProjectileType> ProjectileType;
+
+    UPROPERTY(EditAnywhere)
+        class UBoxComponent* BoxComponent;
+
+    UPROPERTY(EditAnywhere)
+        class UStaticMeshComponent* WeaponMesh;
 
     UPROPERTY(EditDefaultsOnly, Category = Projectile)
-    TSubclassOf<class ARocket> RocketProjectile;
+        TSubclassOf<class ARocket> RocketProjectile;
 
-	UPROPERTY(BlueprintReadOnly, Category = Weapon)
-	int32 CurrentAmmo;
+    UPROPERTY(BlueprintReadOnly, Category = Weapon)
+        int32 CurrentAmmo;
 
-	UPROPERTY(BlueprintReadWrite, Category = Weapon)
-	float DamageMultiplier = 1.f;
+    UPROPERTY(BlueprintReadWrite, Category = Weapon)
+        float DamageMultiplier = 1.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
-    FVector WeaponOffset;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+        FVector WeaponOffset;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+    FVector LocationKnockback;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+    FRotator RotationKnockback;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+        float LocationLerpSpeed;
+        
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+        float RotationLerpSpeed;
 
 protected:
 
-	UFUNCTION()
-    void ResetFire();
+    UFUNCTION()
+        void ResetFire();
 
-	bool bCanFire;
-	bool bWantsToFire;
+    bool bCanFire;
+    bool bWantsToFire;
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+    // Called when the game starts or when spawned
+    virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
+public:
+    // Called every frame
+    virtual void Tick(float DeltaTime) override;
 };

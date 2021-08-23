@@ -12,16 +12,19 @@
 // Sets default values
 AWeapon::AWeapon()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+    // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+    PrimaryActorTick.bCanEverTick = true;
 
-	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
-	BoxComponent->SetupAttachment(RootComponent);
+    BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
+    BoxComponent->SetupAttachment(RootComponent);
 
-	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
-	WeaponMesh->SetupAttachment(BoxComponent);
+    WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
+    WeaponMesh->SetupAttachment(BoxComponent);
 
     WeaponOffset = FVector(20.f, 30.f, -40.f);
+
+    LocationLerpSpeed = 5.f;
+    RotationLerpSpeed = 5.f;
 
     bCanFire = true;
 }
@@ -29,16 +32,20 @@ AWeapon::AWeapon()
 // Called when the game starts or when spawned
 void AWeapon::BeginPlay()
 {
-	Super::BeginPlay();
-	
+    Super::BeginPlay();
+
     CurrentAmmo = WeaponConfig.MaxAmmo;
 }
 
 // Called every frame
 void AWeapon::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+    Super::Tick(DeltaTime);
 
+    FVector WeaponMeshLocation = WeaponMesh->GetRelativeLocation();
+    FRotator WeaponMeshRotation = WeaponMesh->GetRelativeRotation();
+    WeaponMesh->SetRelativeLocation(FMath::VInterpTo(WeaponMeshLocation, FVector::ZeroVector, DeltaTime, LocationLerpSpeed));
+    WeaponMesh->SetRelativeRotation(FMath::RInterpTo(WeaponMeshRotation, FRotator(0, -90.f, 0), DeltaTime, RotationLerpSpeed));
 }
 
 void AWeapon::Fire()
@@ -57,6 +64,8 @@ void AWeapon::Fire()
 
     FTimerHandle ShootDelayHandle;
     GetWorld()->GetTimerManager().SetTimer(ShootDelayHandle, this, &AWeapon::ResetFire, WeaponConfig.TimeBetweenShots);
+
+    Recoil();
 
     OnFireEvent();
 }
@@ -124,6 +133,13 @@ void AWeapon::ProjectileFire()
     {
 
     }
+}
+
+void AWeapon::Recoil()
+{
+    // WeaponMesh will be interpolated back to original offsets.
+    WeaponMesh->SetRelativeLocation(WeaponMesh->GetRelativeLocation() + LocationKnockback);
+    WeaponMesh->SetRelativeRotation(WeaponMesh->GetRelativeRotation() + RotationKnockback);
 }
 
 void AWeapon::StopFire()
