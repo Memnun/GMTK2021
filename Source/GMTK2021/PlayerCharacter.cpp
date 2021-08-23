@@ -63,6 +63,8 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 
     WeaponOffset = FVector(0);
 
+    bBufferJump = false;
+
     /*
     SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("Weapon Spring Arm"));
     SpringArmComponent->bEnableCameraRotationLag = true;
@@ -108,6 +110,13 @@ void APlayerCharacter::Tick(float DeltaTime)
 
     // Weapon swaying
     CalculateWeaponSway(DeltaTime);
+
+    // Jump if buffered
+    if (bBufferJump && GetCharacterMovement()->IsMovingOnGround())
+    {
+        DoJump();
+        bBufferJump = false;
+    }
 }
 
 void APlayerCharacter::MoveForward(float Value)
@@ -229,11 +238,16 @@ void APlayerCharacter::DoJump()
     if (ConsumeJump())
     {
         Jump();
-
-        if (bIsWallRunning)
-        {
-        }
     }
+    else
+    {
+        bBufferJump = true;
+    }
+}
+
+void APlayerCharacter::StopJump()
+{
+    bBufferJump = false;
 }
 
 void APlayerCharacter::ResetJump(int Jumps)
@@ -639,7 +653,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 
     PlayerInputComponent->BindAction("jump", IE_Pressed, this, &APlayerCharacter::DoJump);
-    PlayerInputComponent->BindAction("jump", IE_Released, this, &ACharacter::StopJumping);
+    PlayerInputComponent->BindAction("jump", IE_Released, this, &APlayerCharacter::StopJump);
 
     PlayerInputComponent->BindAction("sprint", IE_Pressed, this, &APlayerCharacter::Sprint);
     PlayerInputComponent->BindAction("sprint", IE_Released, this, &APlayerCharacter::StopSprinting);

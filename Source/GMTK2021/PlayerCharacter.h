@@ -154,6 +154,9 @@ protected:
     void DoJump();
 
     UFUNCTION()
+    void StopJump();
+
+    UFUNCTION()
     void ResetJump(int Jumps);
 
     UFUNCTION()
@@ -209,6 +212,8 @@ protected:
 
     UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Player|Gameplay")
     bool bAutoBunnyhop;
+
+    bool bBufferJump;
 
 public:
 
