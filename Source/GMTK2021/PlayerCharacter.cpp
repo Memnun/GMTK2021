@@ -176,6 +176,7 @@ void APlayerCharacter::OnJumped_Implementation()
 
     JumpBoost();
     
+    GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("Yeah"));
 }
 
 bool APlayerCharacter::CanJumpInternal_Implementation() const
