@@ -61,6 +61,8 @@ void AWeapon::Fire()
     }
 
     CurrentAmmo--;
+    if(WeaponAmmoChangedDelegate.IsBound())
+        WeaponAmmoChangedDelegate.Broadcast(this);
 
     FTimerHandle ShootDelayHandle;
     GetWorld()->GetTimerManager().SetTimer(ShootDelayHandle, this, &AWeapon::ResetFire, WeaponConfig.TimeBetweenShots);

@@ -17,24 +17,24 @@ namespace EWeaponProjectile
 }
 
 // XXX This doesn't really need to exist as a struct does it?
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FWeaponData
 {
     GENERATED_USTRUCT_BODY()
 
-        UPROPERTY(EditDefaultsOnly, Category = Config)
+        UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Config)
         float TimeBetweenShots;
 
-    UPROPERTY(EditDefaultsOnly, Category = Config)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Config)
         float InFireDelay;
 
-    UPROPERTY(EditDefaultsOnly, Category = Config)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Config)
         bool AutoFire;
 
-    UPROPERTY(EditDefaultsOnly, Category = Config)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Config)
         int32 MaxAmmo;
 
-    UPROPERTY(EditDefaultsOnly, Category = Config)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Config)
         float Damage = 10.f;
 };
 
@@ -71,7 +71,7 @@ public:
     UFUNCTION()
         void Recoil();
 
-    UPROPERTY(EditAnywhere, Category = Config)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Config)
         FWeaponData WeaponConfig;
 
     UPROPERTY(EditAnywhere, Category = Config)
@@ -85,6 +85,10 @@ public:
 
     UPROPERTY(EditDefaultsOnly, Category = Projectile)
         TSubclassOf<class ARocket> RocketProjectile;
+
+    /*Text value for the name of the weapon used in the UI*/
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Weapon)
+     FText WeaponName;
 
     UPROPERTY(BlueprintReadOnly, Category = Weapon)
         int32 CurrentAmmo;
@@ -106,6 +110,10 @@ public:
         
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
         float RotationLerpSpeed;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FWeaponChange, AWeapon*, Weapon);
+    UPROPERTY(BlueprintAssignable, Category = Weapon)
+    FWeaponChange WeaponAmmoChangedDelegate;
 
 protected:
 
