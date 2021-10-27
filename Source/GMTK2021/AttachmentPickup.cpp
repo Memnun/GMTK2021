@@ -21,6 +21,10 @@ void AAttachmentPickup::BeginApply_Internal()
 	}
 
 	Player->Attachments.Add(AttachmentClass, this);
+	if (Player->OnAttachmentChanged.IsBound())
+	{
+		Player->OnAttachmentChanged.Broadcast(this);
+	}
 }
 
 void AAttachmentPickup::OnEffectEnd_Internal()

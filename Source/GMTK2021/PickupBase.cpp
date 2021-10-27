@@ -35,6 +35,11 @@ void APickupBase::Tick(float DeltaTime)
 
 }
 
+float APickupBase::GetRemainingDuration()
+{
+	return GetWorld()->GetTimerManager().GetTimerRemaining(ExpirationTimer);
+}
+
 void APickupBase::BeginApplyPickup()
 {
 	BeginApply_Internal();
@@ -56,6 +61,10 @@ void APickupBase::BeginApplyPickup()
 
 void APickupBase::OnEffectEnd_Internal()
 {
+	if (OnEffectEndDelegate.IsBound())
+	{
+		OnEffectEndDelegate.Broadcast(this);
+	}
 	OnEffectEnd();
 	SetLifeSpan(.1f);
 }

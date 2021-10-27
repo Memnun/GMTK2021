@@ -27,6 +27,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	/********************************* SETTINGS *****************************************/
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEffectEndDelegate, APickupBase*, ExpiredEffect);
+	UPROPERTY(BlueprintAssignable, BlueprintReadOnly)
+		FOnEffectEndDelegate OnEffectEndDelegate;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Mesh")
 		UStaticMeshComponent* RootMesh = nullptr;
@@ -34,6 +37,10 @@ public:
 	/*Volume player has to enter to be able to pickup the */
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Collision")
 		USphereComponent* PickupRadius = nullptr;
+
+	/*User readable name for the Pickup, used in UI*/
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Pickup")
+		FText PickupName;
 
 	/*Whether the pickup is automatically picked up or if the pickup has to be triggered by player action*/
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Pickup")
@@ -46,6 +53,9 @@ public:
 	/* If higher than 0 for a persistent effect, will automatically remove the effect after this value in seconds*/
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Pickup")
 		float Duration = -1.f;
+
+	UFUNCTION(BlueprintPure, Category = "Pickup")
+		float GetRemainingDuration();
 
 	/*********************************** Effect Implementation ************************************/
 

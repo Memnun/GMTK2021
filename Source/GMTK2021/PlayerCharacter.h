@@ -234,6 +234,10 @@ public:
     UPROPERTY(BlueprintAssignable, BlueprintReadOnly)
     FOnWeaponChangedDelegate OnWeaponChanged;
 
+    DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttachmentChangedDelegate, AAttachmentPickup*, NewAttachment);
+    UPROPERTY(BlueprintAssignable, BlueprintReadOnly)
+    FOnAttachmentChangedDelegate OnAttachmentChanged;
+
     UFUNCTION()
     void OnComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
